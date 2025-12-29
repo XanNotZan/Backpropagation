@@ -1,117 +1,116 @@
 \documentclass{article}
-\usepackage{graphicx} % Required for inserting images
 \usepackage{amsmath}
 \usepackage[margin=2cm]{geometry}
 \usepackage{xcolor}
 \begin{document}
 
 \noindent
-The easiest way to understand the calculus behind backpropagation is to go through the layers of the neural network that the cost function and its components can be expressed as. 
+The calculus behind backpropagation becomes clear when you view the cost function as a continuous, differentiable composite of the loss function, the activation function, and the pre-activation computation.
 
-\section{$\text{Cost Function, $C$}$}
-$$C = \frac{1}{L_{n}}\sum \limits_{j}^{L_n} \frac{1}{2}(a_{j}^{L} - y_{j})^{2}$$
-$\bullet$ $L_{n}$ is the number of neurons in the output layer, $L$  \\ $\bullet$ $a_{j}^{L}$ is the activation level of the jth neuron in layer $L$ \\ 
+\section{$\text{Cost function, $C$}$}
+$$C = \frac{1}{n_{L}}\sum \limits_{j=1}^{n_{L}} \frac{1}{2}(a_{j}^{L} - y_{j})^{2}$$
+$\bullet$ $n_{L}$ is the number of neurons in the output layer, $L$  \\ $\bullet$ $a_{j}^{L}$ is the activation level of the $j$th neuron in layer $L$ \\ 
 $\bullet$ $y_{j}$ is the expected activation level of the $j$th neuron in layer $L$ \\ \\
-The cost function is a way to quantify how wrong the activation outputs of a neural network are upon completing a forward pass through the network, after being exposed to a training example. Having the ability to express cost as a continuous function of $a_{j}^{l}$, in this case $\frac{1}{2}$ mean squared error, allows us to understand the rate at which cost changes with respect to the activation levels of the output neurons. We express this as the derivative. 
+The cost function is a way to quantify how wrong the activation outputs of a neural network are upon completing a forward pass through the network, after being exposed to a training example. Expressing cost as a continuous function of $a_{j}^{L}$, in this case half of the mean squared error, allows us to understand the rate at which cost changes with respect to the activation levels of the output neurons. We express this as the derivative. 
 
-\textcolor{red}{$$\frac{dC}{da_{j}^{L}} = \frac{1}{L_{n}}(a_{j}^{L} - y_{j})$$}
-The derivative of cost with respect to the activation level of the $j$th neuron in layer $L$ is the derivative of the cost function. 
+\textcolor{red}{$$\frac{dC}{da_{j}^{L}} = \frac{1}{n_{L}}(a_{j}^{L} - y_{j})$$}
+This derivative captures how sensitive the cost is to changes in each output neuron's activation.
 
-\section{Activation Level of a neuron in the output layer, $a_{j}^{L}$}
+\section{Activation level of a neuron in the output layer, $a_{j}^{L}$}
 $$a_{j}^{L} = \sigma (z_{j}^{L})$$
 $\bullet$ $z_{j}^{L}$ is the pre-activation level of the $j$th neuron at layer $L$ \\ \\
-$a_{j}^{L}$ can be expressed as the activation function of $z_{j}^{L}$; in this case, the activation function is sigmoidal. Similarly, we can take advantage of the derivative to understand the rate at which the activation level of the $j$th neuron changes with respect to its pre-activation level. Given that the derivative of the sigmoid function is $\sigma (x)(1-\sigma (x))$,
+$a_{j}^{L}$ can be expressed as the activation function of $z_{j}^{L}$; in this case, the activation function is sigmoid. Similarly, we can use the derivative to understand the rate at which the activation level of the $j$th neuron changes with respect to its pre-activation level. Given that the derivative of the sigmoid function is $\sigma (x)(1-\sigma (x))$,
 \textcolor{blue}{$$\frac{da_{j}^{L}}{dz_{j}^{L}} = \sigma (z_{j}^{L})(1-\sigma (z_{j}^{L})) = a_{j}^{L}(1-a_{j}^{L})$$} 
 
 \section{Pre-activation level of a neuron in the output layer $L$, $z_{j}^{L}$}
-$$z_{j}^{L} = \sum \limits_{k}^{L-1_{n}} w_{jk}a_{k}^{L-1} + b_{j}$$
-$\bullet$ $w_{jk}$ is the weight between the $k$th neuron in layer $L-1$ and the $j$th neuron in layer $L$ \\
+$$z_{j}^{L} = \sum \limits_{k=1}^{n_{L-1}} w_{jk}^{L}a_{k}^{L-1} + b_{j}^{L}$$
+$\bullet$ $w_{jk}^{L}$ is the weight from the $k$th neuron in layer $L-1$ to the $j$th neuron in layer $L$ \\
 $\bullet$ $a_{k}^{L-1}$ is the activation level of the $k$th neuron in layer $L-1$ \\
-$\bullet$ $b_{j}$ the bias of the $j$th neuron in layer $L$ \\
-$\bullet$ $L-1_{n}$ is the number of neurons in layer $L-1$, the last hidden layer \\ \\
-The pre-activation levels of any layer are computed through dot product of the corresponding weight matrix and vector of activation levels from the previous layer, plus the bias vector. The pre-activation level of any specific neuron is the weighted activation level of a connected neuron, plus bias, summed over all neurons in the previous layer. Since $z_{j}^{L}$ is a function defined by two variables, we must take the partial derivative to understand the respective rates of change. 
-\textcolor{cyan}{$$\frac{\partial z_{j}^{L}}{\partial w_{jk}} = a_{k}^{L-1}$$}
+$\bullet$ $b_{j}^{L}$ is the bias of the $j$th neuron in layer $L$ \\
+$\bullet$ $n_{L-1}$ is the number of neurons in layer $L-1$, the last hidden layer \\ \\
+The pre-activation levels of any layer are computed through the matrix-vector product of the corresponding weight matrix and vector of activation levels from the previous layer, plus the bias vector. The pre-activation level of a neuron is the sum of weighted activations from all neurons in the previous layer, plus a bias term. Since $z_{j}^{L}$ is a function of both the weight and bias, we must take the partial derivative to understand the respective rates of change. 
+\textcolor{cyan}{$$\frac{\partial z_{j}^{L}}{\partial w_{jk}^{L}} = a_{k}^{L-1}$$}
 
 \noindent
 The partial derivative of the pre-activation level of the $j$th neuron with respect to the weight between neuron $k$ and neuron $j$ is the activation level of the $k$th neuron in layer $L-1$. 
 
-\textcolor{orange}{$$\frac{\partial z_{j}^{L}}{\partial b_{j}} = 1$$}
+\textcolor{orange}{$$\frac{\partial z_{j}^{L}}{\partial b_{j}^{L}} = 1$$}
 
 \noindent
 The partial derivative of the pre-activation level of the $j$th neuron with respect to its bias is $1$. 
 
-\section*{$\text{Cost Function, $C$, re-expressed}$}
-$$C = \frac{1}{L_{n}} \sum \limits_{j}^{L_n} \frac{1}{2} (\sigma (\sum \limits_{k}^{L-1_{n}} w_{jk}a_{k}^{L-1} + b_{j})-y_{j})^{2}$$
-This equation simply represents the cost function in the terms defined in steps 2 and 3. Crucially, we recognize that cost is a composite function. Taking the derivative of cost with respect to a weight or bias therefore invokes the chain rule, where given $y = f(u)$, $u = g(x)$, $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}$$
+\section*{$\text{Cost function, $C$, re-expressed}$}
+$$C = \frac{1}{n_{L}} \sum \limits_{j=1}^{n_{L}} \frac{1}{2} (\sigma (\sum \limits_{k=1}^{n_{L-1}} w_{jk}^{L}a_{k}^{L-1} + b_{j}^{L})-y_{j})^{2}$$
+This equation represents the cost function in the terms defined in sections 2 and 3. Crucially, we recognize that cost is a composite function. Taking the derivative of cost with respect to a weight or bias therefore invokes the chain rule, where given $h = f(u)$, $u = g(x)$, $$\frac{dh}{dx} = \frac{dh}{du} \frac{du}{dx}$$
 
 \noindent
-Therefore, the derivative of cost with respect to a weight connected to a neuron in the output layer is $$\frac{\partial C}{\partial w_{jk}} = \textcolor{red}{\frac{\partial C}{\partial a_{j}^{L}}} \textcolor{blue}{\frac{\partial a_{j}^{L}}{\partial z_{j}^{L}}} \textcolor{cyan}{\frac{\partial z_{j}^{L}}{\partial w_{jk}}}$$ $$= \textcolor{red}{\frac{1}{L_{n}}(a_{j}^{L} - y_{j})} \cdot \textcolor{blue}{a_{j}^{L}(1-a_{j}^{L})} \cdot \textcolor{cyan}{a_{k}^{L-1}}$$
+Therefore, the derivative of cost with respect to a weight connected to a neuron in the output layer is, $$\frac{\partial C}{\partial w_{jk}^{L}} = \textcolor{red}{\frac{\partial C}{\partial a_{j}^{L}}} \textcolor{blue}{\frac{\partial a_{j}^{L}}{\partial z_{j}^{L}}} \textcolor{cyan}{\frac{\partial z_{j}^{L}}{\partial w_{jk}^{L}}}$$ $$= \textcolor{red}{\frac{1}{n_{L}}(a_{j}^{L} - y_{j})} \cdot \textcolor{blue}{a_{j}^{L}(1-a_{j}^{L})} \cdot \textcolor{cyan}{a_{k}^{L-1}}$$
 
 \noindent
 The derivative of cost with respect to the bias of a neuron in the output layer is 
-$$\frac{\partial C}{\partial b_{j}} = \textcolor{red}{\frac{\partial C}{\partial a_{j}^{L}}} \textcolor{blue}{\frac{\partial a_{j}^{L}}{\partial z_{j}^{L}}} \textcolor{orange}{\frac{\partial z_{j}^{L}}{\partial b_{j}}}$$ 
-$$= \textcolor{red}{\frac{1}{L_{n}}(a_{j}^{L} - y_{j})} \cdot \textcolor{blue}{a_{j}^{L}(1-a_{j}^{L})} \cdot \textcolor{orange}{1}$$
+$$\frac{\partial C}{\partial b_{j}^{L}} = \textcolor{red}{\frac{\partial C}{\partial a_{j}^{L}}} \textcolor{blue}{\frac{\partial a_{j}^{L}}{\partial z_{j}^{L}}} \textcolor{orange}{\frac{\partial z_{j}^{L}}{\partial b_{j}^{L}}}$$ 
+$$= \textcolor{red}{\frac{1}{n_{L}}(a_{j}^{L} - y_{j})} \cdot \textcolor{blue}{a_{j}^{L}(1-a_{j}^{L})} \cdot \textcolor{orange}{1}$$
 
-\section*{$\text{Error}$}
+\section*{$\text{Error, } \delta_{j}^{L}$}
 $$\delta_{j}^{L} = \frac{\partial C}{\partial z_{j}^{L}} = \textcolor{red}{\frac{\partial C}{\partial a_{j}^{L}}} \textcolor{blue}{\frac{\partial a_{j}^{L}}{\partial z_{j}^{L}}}$$
 \noindent
-Let us define $\delta_{j}^{L}$ as the derivative of cost with respect to the $j$th neuron's pre-activation level. Conceptually, this quantifies how wrong the pre-activation level is, and in what direction the value must shift. For a neuron in the output layer, this is easily calculated, as demonstrated above. In other layers, however, one cannot simply take the derivative of a cost function to derive $\textcolor{red}{\frac{\partial C}{\partial a_{j}^{L}}}$, as there is no expected activation level for these neurons. This is problematic, for if one expects to calculate gradients for all weights and biases, the error term as defined above fails to generalize beyond the output neurons.
+Let us define $\delta_{j}^{L}$ as the derivative of cost with respect to the $j$th neuron's pre-activation level. Conceptually, this quantifies how wrong the pre-activation level is, and in what direction the value must shift. For a neuron in the output layer, this is easily calculated, as demonstrated above. In other layers, however, one cannot directly compute $\textcolor{red}{\frac{\partial C}{\partial a_{j}^{l}}}$ from the cost function, as we have no ground-truth labels to derive it for non-output layers. This is problematic, for if one expects to calculate gradients for all weights and biases, the error term as defined above fails to generalize beyond the output neurons.
 \\ \\
-The \textcolor{red}{derivative of cost with respect to the activation level of a neuron} can only be modeled by the contribution of the neuron to the error of the next layer's neurons. Luckily, this is straightforward. For an arbitrary neuron, $z$, 
+The \textcolor{red}{derivative of cost with respect to the activation level of a neuron} can only be computed from the contribution of the neuron to the error of the next layer's neurons. Fortunately, this is straightforward. For an arbitrary neuron, $j$, in layer $l$,
 
-$$\delta_{z} = \textcolor{red}{\frac{\partial C}{\partial a_{z}}} = \sum \limits_{q}^{n} w_{qz} \delta_{q}$$
+$$\textcolor{red}{\frac{\partial C}{\partial a_{j}^{l}}} = \sum \limits_{q=1}^{n_{l+1}} w_{qj}^{l+1} \delta_{q}^{l+1}$$
 \noindent
-$\bullet$ $n$ is the number of neurons in the layer after neuron $z$'s \\
-$\bullet$ $q$ is an arbitrary neuron in the layer after neuron $z$'s \\
-$\bullet$ $w_{qz}$ is the weight from neuron $z$ to $q$ \\
-$\bullet$ $\delta_{q}$ is the error term of $q$ \\ \\
+$\bullet$ $n_{l+1}$ is the number of neurons that receive input from neuron $j$ \\
+$\bullet$ $q$ is an arbitrary neuron that receives input from neuron $j$ \\
+$\bullet$ $w_{qj}^{l+1}$ is the weight from neuron $j$ to $q$ \\
+$\bullet$ $\delta_{q}^{l+1}$ is the error term of $q$ \\ \\
 \noindent
-This captures the proportional effect of neuron $z$ on the subsequent layer. With this, it becomes evident why backpropagation is necessary. The error term for non-output layers is derived from the subsequent layer, which means that the calculation must begin with the error of neurons in the output layer and work backwards. \\ \\
+This captures the proportional effect of neuron $j$ on the subsequent layer. With this, it becomes evident why backpropagation is necessary. The error term for non-output layers is derived from the subsequent layer, which means that the calculation must begin with the error of neurons in the output layer and work backwards. \\ \\
 \noindent
 Therefore, the derivative of cost with respect to any weight from arbitrary neuron $k$ to neuron $j$, is 
-$$\frac{\partial C}{\partial w_{jk}} = \delta_j \cdot \textcolor{cyan}{a_{k}^{L-1}}$$
+$$\frac{\partial C}{\partial w_{jk}^{l}} = \delta_j^l \cdot \textcolor{cyan}{a_{k}^{l-1}}$$
 And the derivative of cost with respect to any bias for an arbitrary neuron $j$ is
-$$\frac{\partial C}{\partial b_{j}} = \delta_j \cdot \textcolor{orange}{1} = \delta_j$$
+$$\frac{\partial C}{\partial b_{j}^{l}} = \delta_j^l \cdot \textcolor{orange}{1} = \delta_j^l$$
 
 
-\section*{Gradients}
+\section*{$\text{Gradients, } \nabla W^{l} \text{ and } \nabla b^{l}$}
 
 Now that we understand how the individual derivatives are calculated, we can assemble them as a gradient. Vectorizing these operations allows for greater computational efficiency. Thus, we will model the process using linear algebra. \\
 
 \noindent
 Since the error term is central to these calculations, we must first derive $\delta^{l}$, the vector representing the error of the neurons in an arbitrary layer $l$. Recall that the process for calculating the errors of the output layer is unique. For the output layer $L$,
-$$\delta^L = \frac{1}{L_n}(a^L - y) \odot \frac{\partial \sigma}{\partial z^{L}}$$
+$$\delta^L = \frac{1}{n_{L}}(a^L - y) \odot \frac{\partial \sigma}{\partial z^{L}}$$
 
 \noindent
 $\bullet$ $a^{L}$ is the vector of activation levels for the output layer, calculated during the forward pass\\
 $\bullet$ $y$ is the vector of expected activation levels for the output layer\\
 $\bullet$ $z^{L}$ is the vector of pre-activation levels for the output layer\\ \\
-Multiplying the vector $a^{L} - y$ with a scalar $\frac{1}{L_n}$ yields a vector with elements corresponding to the \textcolor{red}{derivative of cost with respect to the activation level} of each output neuron. Taking the Hadamard product (element-wise multiplication) with the vector $\frac{\partial \sigma}{\partial z^{L}}$ multiplies each \textcolor{red}{derivative} in the cost vector with \textcolor{blue}{the derivative of the activation level with respect to the pre-activation level}, yielding a vector of error terms for the output layer. \\ \\
+Multiplying the vector $a^{L} - y$ by a scalar $\frac{1}{n_{L}}$ yields a vector with elements corresponding to the \textcolor{red}{derivative of cost with respect to the activation level} of each output neuron. Taking the Hadamard product (element-wise multiplication) with the vector $\frac{\partial \sigma}{\partial z^{L}}$ multiplies each \textcolor{red}{derivative} in the cost vector by \textcolor{blue}{the derivative of the activation level with respect to the pre-activation level}, yielding a vector of error terms for the output layer. \\ \\
 For all other layers $l$,
 
 $$\delta^l = (W^{l+1})^T \cdot \delta^{l+1} \odot \frac{\partial \sigma}{\partial z^{l}}$$
 $\bullet$ $W^{l+1}$ is the matrix of weights connecting layer $l$ with layer $l+1$\\
 $\bullet$ $\delta^{l+1}$ is the error vector of the subsequent layer \\
 $\bullet$ $z^{l}$ is the vector of pre-activation levels of layer $l$ \\ \\
-The resulting vector of the dot product $(W^{l+1})^T \cdot \delta^{l+1}$ consists of the \textcolor{red}{derivative of cost with respect to the activation level} of the neurons in $l$. Recall that the error of neurons in layer $l$ are computed as the weighted sum of errors in $l+1$. Transposing $W^{l+1}$ allows each weight from layer $l$ to $l+1$ to be multiped by the corresponding error of the neuron in $l+1$, and then summed. Once again, taking the Hadamard product with $\frac{\partial \sigma}{\partial z^{L}}$ yields the error vector. \\ \\ 
+The resulting vector of the product $(W^{l+1})^T \cdot \delta^{l+1}$ consists of the \textcolor{red}{derivative of cost with respect to the activation level} of the neurons in $l$. Recall that the error of neurons in layer $l$ is computed as the weighted sum of errors in $l+1$. Transposing $W^{l+1}$ allows each weight from layer $l$ to $l+1$ to be multiplied by the corresponding error of the neuron in $l+1$, and then summed. Once again, taking the Hadamard product with $\frac{\partial \sigma}{\partial z^{l}}$ yields the error vector. \\ \\ 
 Now that we have established how to find the error vectors in a computationally efficient manner, we must use these vectors to calculate the gradients. \\ \\
 The weight gradient for $W^{l}$ is a matrix yielded by vector multiplication
 $$\nabla W^{l} = \delta^{l} \cdot (a^{l-1})^T$$
-Since vectors are typically columnar by default, transposing $a^{l-1}$ enables the dot product operation with $\delta^{l}$. Note that this is not a typical dot product, which would be a row vector multipled by a column vector, yielding a scalar. The reverse, as in this case, is called the outer product. \\ \\
-Also notice the similarity of the dot product to the previously derived derivative of cost with respect to $w_{jk}$. Indeed, the elements of the matrix are those derivatives, corresponding to a particular weight. Specifically, the element at position $(j,k)$ in $\nabla W^l$ is:
-$$(\nabla W^l)_{jk} = \delta_j^l \cdot \textcolor{cyan}{a_k^{l-1}} = \frac{\partial C}{\partial w_{jk}^l}$$ As the vectors $\delta^{l}$ and $a^{l-1}$ have dimensionality equal to the number of neurons in their respective layers, the outer product yields a matrix with dimensionality equal to $w^{l}$. If layer $l-1$ has $m$ neurons and layer $l$ has $n$ neurons:
+Since vectors are column vectors by convention, transposing $a^{l-1}$ enables multiplication with $\delta^{l}$. Note that this is not a typical dot product, which would be a row vector multiplied by a column vector, yielding a scalar. The reverse, as in this case, is called the outer product. \\ \\
+Also notice the similarity of the outer product to the previously derived derivative of cost with respect to $w_{jk}$. Indeed, the elements of the matrix are those derivatives, corresponding to a particular weight. Specifically, the element at position $(j,k)$ in $\nabla W^l$ is:
+$$(\nabla W^l)_{jk} = \delta_j^l \cdot \textcolor{cyan}{a_k^{l-1}} = \frac{\partial C}{\partial w_{jk}^l}$$ As the vectors $\delta^{l}$ and $a^{l-1}$ have dimensionality equal to the number of neurons in their respective layers, the outer product yields a matrix with dimensionality equal to $W^{l}$. If layer $l-1$ has $m$ neurons and layer $l$ has $n$ neurons:
 $$\delta^l \text{ is size } n \times 1$$ 
 $$(a^{l-1})^{T} \text{ is size } 1 \times m$$
 $$(n \times 1) \cdot (1 \times m) = (n \times m)$$
 \noindent
 All that remains is to compute the updated weight matrix using matrix subtraction.
-$$W^{l}- \eta \cdot\nabla W^{l}$$
+$$W^{l} - \eta \cdot \nabla W^{l}$$
 $\bullet$ $\eta$ is the learning rate, a scalar used to avoid making the updates to $W^{l}$ too large. \\
 
 \noindent
 The gradient for bias is even simpler; for the bias vector of a layer $l$, $b^{l}$,
 $$\nabla b^{l} = \delta^{l}$$
-Since deriving the bias gradient requires no further operations on the error vector, it should be apparent how the element and size of the bias gradient correspond to that of the bias vector. Finally, updating the existing bias vector,
+Since deriving the bias gradient requires no further operations on the error vector, it should be apparent how the elements and size of the bias gradient correspond to those of the bias vector. Finally, updating the existing bias vector,
 $$b^{l} - \eta \cdot \nabla b^{l}$$
-Once these operations are applied at every layer, backpropagation is complete, using stochastic gradient descent. For batch gradient descent, find the average gradient after passing all training examples through the network, and then update the weights and biases accordingly. For mini-batch gradient descent, find the average gradient after passing in a randomly selected set of training examples, and then update the weights and biases. Computationally speaking, this is the most efficient method. 
+Once these operations are applied at every layer, backpropagation is complete. This process describes stochastic gradient descent—updating after each example. For batch gradient descent, find the average gradient after passing all training examples through the network, and then update the weights and biases accordingly. For mini-batch gradient descent, find the average gradient after passing in a randomly selected set of training examples, and then update the weights and biases. This often provides the best tradeoff between convergence stability and efficiency; batches are large enough to reduce variance of gradient estimates, but small enough to permit frequent parameter updates per epoch.
 \end{document}
